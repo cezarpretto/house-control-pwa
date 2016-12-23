@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>House Controll</title><!-- MANIFEST -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- ADD TO HOMESCREEN SAFARI ON IOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Simple PWA">
+    <link rel="apple-touch-icon" href="./src/assets/img/icon-152.png">
+
+    <!-- ADD TO HOMESCREEN WINDOWS -->
+    <meta name="msapplicatoin-TileImage" content="./src/assets/img/icon-144.png">
+    <meta name="msapplicatoin-TileColor" content="#3d5165">
+
+    <link rel="stylesheet" href="vendors/bootstrap/bootstrap.min.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <h1 class="text-primary"><strong>HOUSE CONTROL</strong></h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                Ações disponíveis:
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <button type="button" class="btn btn-default btn-block" v-on:click="acionarPortao(1)">
+                      PORTÃO QG
+                    </button>
+                    <br>
+                  </div>
+                  <div class="col-sm-6">
+                    <button type="button" class="btn btn-default btn-block" v-on:click="acionarPortao(2)">
+                      PORTÃO ANDRÉ
+                    </button>
+                    <br>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label for="">Endereço IP:</label>
+                      <input type="text" class="form-control" id="" placeholder="" v-model="enderecoIpInput">
+                      <br>
+                      <button type="button" class="btn btn-success btn-block" v-on:click="setIp()">
+                        SALVAR
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="vendors/vue/vue.min.js" charset="utf-8"></script>
+    <script src="vendors/jquery/jquery.min.js" charset="utf-8"></script>
+    <script src="vendors/bootstrap/bootstrap.min.js" charset="utf-8"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(function (registration) {
+          // Registration Success
+          console.log('[serviceWorker]: registration successful with scope: ', registration.scope);
+        }).catch(function (err) {
+          // Registration failed :(
+          console.log('[serviceWorker] registration failed', err);
+        });
+      }
+    </script>
+    <script type="text/javascript">
+      var app = new Vue({
+        el: '#app',
+        data: {
+          enderecoIp: '',
+          enderecoIpInput: ''
+        },
+        mounted: function(){
+          this.enderecoIpInput = JSON.parse(window.localStorage.getItem('ip'));
+          if(this.enderecoIpInput === null){
+            this.enderecoIp = 'http://172.16.10.97/'
+            this.enderecoIpInput = '172.16.10.97';
+          }else{
+            this.enderecoIp = 'http://' + this.enderecoIpInput + '/';
+          }
+        },
+        methods: {
+          acionarPortao: function(portao) {
+            var ip = this.enderecoIp;
+            if(portao === 1){
+              ip += 'qg';
+            }else{
+              ip += 'andre';
+            }
+
+            fetch(ip, {mode: 'no-cors'}).then(function(data) {
+              console.log(data);
+            }).catch(function(err) {
+              console.log(err);
+            });
+          },
+
+          setIp: function() {
+            if(this.enderecoIpInput.length !== 0){
+              this.enderecoIp = 'http://' + this.enderecoIpInput + '/';
+              window.localStorage.setItem('ip', JSON.stringify(this.enderecoIpInput));
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
